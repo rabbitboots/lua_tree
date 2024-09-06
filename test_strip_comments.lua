@@ -37,9 +37,9 @@ local lOut = require(PATH .. "lua_out")
 local parse = require(PATH .. "lua_parse")
 
 
-local errTest = require(PATH .. "test.err_test.err_test")
-local inspect = require(PATH .. "test.inspect.inspect")
-local stringWalk = require(PATH .. "lib.string_walk.string_walk")
+local errTest = require(PATH .. "test.err_test")
+local inspect = require(PATH .. "test.inspect")
+local stringWalk = require(PATH .. "lib.string_walk")
 
 
 local hex = string.char

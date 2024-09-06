@@ -36,9 +36,9 @@ local lex = require(PATH .. "lua_lex")
 local pretty = require(PATH .. "test_pretty")
 
 
-local errTest = require(PATH .. "test.err_test.err_test")
-local inspect = require(PATH .. "test.inspect.inspect")
-local stringWalk = require(PATH .. "lib.string_walk.string_walk")
+local errTest = require(PATH .. "test.err_test")
+local inspect = require(PATH .. "test.inspect")
+local stringWalk = require(PATH .. "lib.string_walk")
 
 
 local cli_verbosity
@@ -63,32 +63,41 @@ self:registerJob("lex.name, lex.space", function(self)
 		local W = lex.newLexer("function", "5.1", false)
 		local t = lex.name(W)
 		self:isNil(t, nil)
+
+		self:lf(3)
 	end
 
 
 	do
+		self:print(4, "[+] lexing a simple name")
 		local W = lex.newLexer("foo", "5.1", false)
 		local t = lex.name(W)
 		self:isType(t, "table")
 		self:isEqual(t.id, "name")
 		self:isEqual(t.text, "foo")
+
+		self:lf(3)
 	end
 
 
 	-- Spaces and comments are automatically attached to nodes as delimiters.
-	-- A root token exists to catch opening delimiters before the first bit
-	-- of real code.
+	-- The root token catches opening delimiters before the first bit of real
+	-- code.
 	do
+		self:print(4, "[+] lexing whitespace")
 		local W = lex.newLexer(" \t\r\v\n", "5.1", false)
 		local root = W.t[1]
 		self:isType(root, "table")
 		self:isEqual(root.id, "root")
 		self:isEqual(root.delim[1].id, "space")
 		self:isEqual(root.delim[1].text, " \t\r\v\n")
+
+		self:lf(3)
 	end
 
 
 	do
+		self:print(4, "[+] lexing names separated by whitespace")
 		local W = lex.newLexer(" foo\tbar ", "5.1", false)
 		local root = W.t[1]
 		self:isEqual(root.id, "root")
@@ -106,6 +115,27 @@ self:registerJob("lex.name, lex.space", function(self)
 		self:isEqual(t2.text, "bar")
 		self:isEqual(t2.delim[1].id, "space")
 		self:isEqual(t2.delim[1].text, " ")
+
+		self:lf(3)
+	end
+
+
+	do
+		self:print(4, "[+] lexing LuaJIT Unicode names")
+		local W = lex.newLexer("foöbaró ¡Æøſㇱㇹ㈅꠲꠹𐅀𐅁𐅅 \128\129\130\131\132", "5.1", true)
+		local t1 = lex.name(W)
+		self:isEqual(t1.id, "name")
+		self:isEqual(t1.text, "foöbaró")
+
+		local t2 = lex.name(W)
+		self:isEqual(t2.id, "name")
+		self:isEqual(t2.text, "¡Æøſㇱㇹ㈅꠲꠹𐅀𐅁𐅅")
+
+		local t3 = lex.name(W)
+		self:isEqual(t3.id, "name")
+		self:isEqual(t3.text, "\128\129\130\131\132")
+
+		self:lf(3)
 	end
 end
 )
@@ -142,6 +172,8 @@ self:registerJob("lex.symbol", function(self)
 		t = lex.symbol(W)
 		self:isEqual(t.id, ".")
 		self:isEqual(t.text, ".")
+
+		self:lf(3)
 	end
 end
 )
@@ -156,6 +188,8 @@ self:registerJob("lex.keyword", function(self)
 		local W = lex.newLexer("notto", "5.1", false)
 		local t = lex.symbol(W)
 		self:isEqual(t, nil)
+
+		self:lf(3)
 	end
 
 
@@ -182,6 +216,8 @@ self:registerJob("lex.keyword", function(self)
 		t = lex.keyword(W)
 		self:isEqual(t.id, "end")
 		self:isEqual(t.text, "end")
+
+		self:lf(3)
 	end
 end
 )
@@ -225,6 +261,8 @@ self:registerJob("lex.string", function(self)
 		self:isEqual(t.id, "string")
 		self:isEqual(t.text, "foo\\tbar")
 		self:isEqual(t.quote, "'")
+
+		self:lf(3)
 	end
 
 
@@ -236,10 +274,12 @@ self:registerJob("lex.string", function(self)
 		self:isEqual(t.id, "string")
 		self:isEqual(t.text, "\\\\")
 		self:isEqual(t.quote, "\"")
+
+		self:lf(3)
 	end
 
 
-	-- In normal strings lines ending with '\' are continued on the next line.
+	-- In normal strings, lines ending with '\' are continued on the next line.
 	do
 		local ex_str = [=====[
 'foo\
@@ -249,6 +289,8 @@ bar']=====]
 		self:isEqual(t.id, "string")
 		self:isEqual(t.text, "foo\\\nbar")
 		self:isEqual(t.quote, "'")
+
+		self:lf(3)
 	end
 
 
@@ -259,6 +301,8 @@ bar']=====]
 		self:isEqual(t.id, "string")
 		self:isEqual(t.text, "foo\\'bar")
 		self:isEqual(t.quote, "'")
+
+		self:lf(3)
 	end
 
 
@@ -269,6 +313,8 @@ bar']=====]
 		self:isEqual(t.id, "string")
 		self:isEqual(t.text, "foo\\\"bar")
 		self:isEqual(t.quote, "\"")
+
+		self:lf(3)
 	end
 end
 )
@@ -285,6 +331,8 @@ self:registerJob("lex.comment", function(self)
 		self:isEqual(root.delim[1].id, "comment")
 		self:isEqual(root.delim[1].text, "")
 		self:isEqual(root.delim[1].level, false)
+
+		self:lf(3)
 	end
 
 
@@ -295,6 +343,8 @@ self:registerJob("lex.comment", function(self)
 		self:isEqual(root.delim[1].id, "comment")
 		self:isEqual(root.delim[1].text, "foo")
 		self:isEqual(root.delim[1].level, false)
+
+		self:lf(3)
 	end
 
 
@@ -305,6 +355,8 @@ self:registerJob("lex.comment", function(self)
 		self:isEqual(root.delim[1].id, "comment")
 		self:isEqual(root.delim[1].text, "foo\nbar")
 		self:isEqual(root.delim[1].level, 5)
+
+		self:lf(3)
 	end
 end
 )
@@ -327,6 +379,8 @@ self:registerJob("lex.number", function(self)
 
 		W = lex.newLexer("12ze", "5.1", false)
 		self:expectLuaError("Malformed number 4", lex.number, W)
+
+		self:lf(3)
 	end
 
 
@@ -335,6 +389,8 @@ self:registerJob("lex.number", function(self)
 		local t = lex.number(W)
 		self:isEqual(t.id, "number")
 		self:isEqual(t.text, "1")
+
+		self:lf(3)
 	end
 
 
@@ -343,6 +399,8 @@ self:registerJob("lex.number", function(self)
 		local t = lex.number(W)
 		self:isEqual(t.id, "number")
 		self:isEqual(t.text, "0.0")
+
+		self:lf(3)
 	end
 
 
@@ -351,6 +409,8 @@ self:registerJob("lex.number", function(self)
 		local t = lex.number(W)
 		self:isEqual(t.id, "number")
 		self:isEqual(t.text, "0.0")
+
+		self:lf(3)
 	end
 
 
@@ -359,6 +419,8 @@ self:registerJob("lex.number", function(self)
 		local t = lex.number(W)
 		self:isEqual(t.id, "number")
 		self:isEqual(t.text, "0")
+
+		self:lf(3)
 	end
 
 
@@ -367,6 +429,8 @@ self:registerJob("lex.number", function(self)
 		local t = lex.number(W)
 		self:isEqual(t.id, "number")
 		self:isEqual(t.text, "1e1")
+
+		self:lf(3)
 	end
 
 
@@ -376,6 +440,8 @@ self:registerJob("lex.number", function(self)
 		local t = lex.number(W)
 		self:isEqual(t.id, "number")
 		self:isEqual(t.text, "1ULL")
+
+		self:lf(3)
 	end
 
 
@@ -384,6 +450,8 @@ self:registerJob("lex.number", function(self)
 		local W = lex.newLexer(".", "5.1", true)
 		local t = lex.number(W)
 		self:isEqual(t, nil)
+
+		self:lf(3)
 	end
 end
 )

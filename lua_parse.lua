@@ -36,7 +36,7 @@ local parse = {}
 --local stringWalk = require("lib.string_walk.string_walk")
 
 
---local inspect = require("test.inspect.inspect") -- debug
+--local inspect = require("test.inspect") -- debug
 local lex = require("lua_lex")
 --local pretty = require("test_pretty") -- debug
 local shared = require("lua_shared")

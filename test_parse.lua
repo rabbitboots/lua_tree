@@ -39,8 +39,8 @@ local parse = require(PATH .. "lua_parse")
 local pretty = require(PATH .. "test_pretty")
 
 
-local errTest = require(PATH .. "test.err_test.err_test")
-local inspect = require(PATH .. "test.inspect.inspect")
+local errTest = require(PATH .. "test.err_test")
+local inspect = require(PATH .. "test.inspect")
 
 
 local cli_verbosity

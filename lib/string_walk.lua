@@ -1,4 +1,4 @@
--- stringWalk v2.1.0 (modified)
+-- stringWalk v2.1.1
 -- https://www.github.com/rabbitboots/string_walk
 
 
@@ -433,7 +433,7 @@ function _mt_walk.getLineCharNumbers(W)
 
 	local s, i = _baseInfo(W)
 	local ln, cn = stringWalk.countLineChar(s, i, 1, 1, 1)
-	return ln + 1, cn
+	return ln, cn
 end
 
 

@@ -37,7 +37,7 @@ local lOut = require(PATH .. "lua_out")
 local parse = require(PATH .. "lua_parse")
 
 
-local errTest = require(PATH .. "test.err_test.err_test")
+local errTest = require(PATH .. "test.err_test")
 
 
 local cli_verbosity

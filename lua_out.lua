@@ -32,7 +32,7 @@ local PATH = ... and (...):match("(.-)[^%.]+$") or ""
 local lOut = {}
 
 
-local inspect = require(PATH .. "test.inspect.inspect")
+local inspect = require(PATH .. "test.inspect")
 local shared = require(PATH .. "lua_shared")
 
 
@@ -93,7 +93,7 @@ local function _insert(node, tmp)
 end
 
 
-local function _concat(tree, tmp)
+local function _combine(tree, tmp)
 	_insert(tree, tmp)
 	if tree.delim then
 		for i, delim in ipairs(tree.delim) do
@@ -102,24 +102,27 @@ local function _concat(tree, tmp)
 	end
 	if tree.children then
 		for i, child in ipairs(tree.children) do
-			_concat(child, tmp)
+			_combine(child, tmp)
 		end
 	end
-	return table.concat(tmp)
 end
 
 
 function lOut.concat(tree)
 	_argType(1, tree, "table")
 
-	return _concat(tree, {})
+	local tmp = {}
+	_combine(tree, tmp)
+	return table.concat(tmp)
 end
 
 
 function lOut.print(tree)
 	_argType(1, tree, "table")
 
-	print(_concat(tree, {}))
+	local tmp = {}
+	_combine(tree, tmp)
+	print(table.concat(tmp))
 end
 
 

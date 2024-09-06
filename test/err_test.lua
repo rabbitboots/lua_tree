@@ -1,4 +1,4 @@
--- errTest v2.1.1
+-- errTest v2.1.2
 -- https://github.com/rabbitboots/err_test
 
 --[[
@@ -51,7 +51,6 @@ errTest.lang = {
 	test_begin = "*** Begin test: $1 ***",
 	test_end = "*** End test: $1 ***",
 	test_expect_pass = "[expectReturn] $1: $2 ($3): ",
-	test_expect_pass_failed = "Expected passing call failed:",
 	test_expect_fail = "[expectError] $1: $2 ($3): ",
 	test_expect_fail_passed = "Expected failing call passed:",
 	test_totals = "$1 jobs passed. Warnings: $2"
@@ -241,10 +240,7 @@ function _mt_test:expectLuaReturn(desc, func, ...)
 
 	self:write(3, interp(lang.test_expect_pass, desc or "", getLabel(self, func), varargsToString(self, ...)))
 
-	local ok, a,b,c,d,e,f = pcall(func, ...)
-	if not ok then
-		error(lang.test_expect_pass_failed .. "\n\t" .. _str(a,b,c,d,e,f))
-	end
+	local a,b,c,d,e,f = func(...)
 
 	self:lf(4)
 
@@ -267,8 +263,6 @@ function _mt_test:expectLuaError(desc, func, ...)
 	self:write(4, " >  " .. _str(a))
 	self:lf(4)
 	self:lf(3)
-
-	return a
 end
 
 

@@ -32,7 +32,7 @@ SOFTWARE.
 local lex = {}
 
 
-local stringWalk = require("lib.string_walk.string_walk")
+local stringWalk = require("lib.string_walk")
 
 
 --local inspect = require("test.inspect.inspect") -- debug
@@ -196,17 +196,16 @@ end
 function lex.name(W)
 	local i = W.I
 	local key_hash = shared.keywords_hash[_luaKeyVer(W)]
+	local s
+	-- LuaJIT accepts non-ASCII bytes for names. In practice, this means you can use
+	-- UTF-8 code points greater than U+007F for variable identifiers.
 	if W.jit then
-		while W:match(stringWalk.ptn_code) do end
-		local s = W.S:sub(i, W.I - 1)
-		if W.I > i and not key_hash[s] then
-			return _token(W, {id="name", text=s, i=i})
-		end
+		s = W:match("^[%a_\128-\255][%w_\128-\255]*")
 	else
-		local s = W:match("^[%a_][%w_]*")
-		if s and not key_hash[s] then
-			return _token(W, {id="name", text=s, i=i})
-		end
+		s = W:match("^[%a_][%w_]*")
+	end
+	if s and not key_hash[s] then
+		return _token(W, {id="name", text=s, i=i})
 	end
 	W:seek(i)
 end
