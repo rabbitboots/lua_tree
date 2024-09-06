@@ -57,7 +57,9 @@ A wrapper for `parse.parse()` that loads a file from disk.
 
 ## Character Classes
 
-* In Lua, string character classes are determined by the current locale. This affects which characters are designated as alphanumeric, as whitespace, etc.
+In Lua, string character classes are determined by the current locale. This affects which characters are designated as alphanumeric, as whitespace, etc.
+
+LuaJIT accepts non-ASCII characters for names. In practice, this means you can use multi-byte UTF-8 characters as part of variable identifiers: `¡ö¿`, etc.
 
 
 ## Differences from the eBNF
