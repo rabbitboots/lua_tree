@@ -68,7 +68,7 @@ end
 local sym = parse.sym
 
 
-local self = errTest.new("Parser early work")
+local self = errTest.new("Parser early work", cli_verbosity)
 
 
 local function _setup(str, lua_ver, jit)
@@ -77,7 +77,7 @@ local function _setup(str, lua_ver, jit)
 	return P
 end
 
-
+-- [========[
 -- [===[
 self:registerJob("sym.name", function(self)
 
@@ -953,28 +953,28 @@ self:registerJob("sym.args()", function(self)
 	do
 		local P = _setup("(a", "5.1", false)
 
-		local n = self:expectLuaError("incomplete args", sym.args, P)
+		local n = self:expectLuaError("incomplete args", sym.args, P, 1)
 	end
 
 
 	do
 		local P = _setup("{", "5.1", false)
 
-		local n = self:expectLuaError("incomplete tableconstructor", sym.args, P)
+		local n = self:expectLuaError("incomplete tableconstructor", sym.args, P, 1)
 	end
 
 
 	do
 		local P = _setup("(a, )", "5.1", false)
 
-		local n = self:expectLuaError("nothing following comma", sym.args, P)
+		local n = self:expectLuaError("nothing following comma", sym.args, P, 1)
 	end
 
 
 	do
 		local P = _setup("()", "5.1", false)
 
-		local n = self:expectLuaReturn("minimal args list", sym.args, P)
+		local n = self:expectLuaReturn("minimal args list", sym.args, P, 1)
 		pretty.print(n)
 	end
 
@@ -982,7 +982,7 @@ self:registerJob("sym.args()", function(self)
 	do
 		local P = _setup("(1.1, 2.2, 3.3)", "5.1", false)
 
-		local n = self:expectLuaReturn("expected behavior (explist)", sym.args, P)
+		local n = self:expectLuaReturn("expected behavior (explist)", sym.args, P, 1)
 		pretty.print(n)
 	end
 
@@ -990,7 +990,7 @@ self:registerJob("sym.args()", function(self)
 	do
 		local P = _setup("{1.1, 2.2, 3.3;}", "5.1", false)
 
-		local n = self:expectLuaReturn("expected behavior (tableconstructor)", sym.args, P)
+		local n = self:expectLuaReturn("expected behavior (tableconstructor)", sym.args, P, 1)
 		pretty.print(n)
 	end
 
@@ -998,7 +998,7 @@ self:registerJob("sym.args()", function(self)
 	do
 		local P = _setup("'foobar'", "5.1", false)
 
-		local n = self:expectLuaReturn("expected behavior (string)", sym.args, P)
+		local n = self:expectLuaReturn("expected behavior (string)", sym.args, P, 1)
 		pretty.print(n)
 	end
 end)
@@ -1866,6 +1866,28 @@ self:registerJob("parse.newParser(), parse.parse()", function(self)
 
 		pretty.print(tree)
 		self:isEqual(tree.id, "root")
+	end
+	--]====]
+end)
+--]===]
+--]========]
+
+-- [===[
+self:registerJob("test ambiguous syntax", function(self)
+	-- [====[
+	do
+		local str = "a\n()"
+		local P = _setup(str, "5.1", false)
+		self:expectLuaError("ambiguous syntax: 'a\\n()'", sym.block, P)
+	end
+	--]====]
+
+
+	-- [====[
+	do
+		local str = "a--[[\n]]()"
+		local P = _setup(str, "5.1", false)
+		self:expectLuaError("ambiguous syntax: 'a--[[\\n]]()'", sym.block, P)
 	end
 	--]====]
 end)

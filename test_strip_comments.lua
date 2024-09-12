@@ -67,7 +67,7 @@ local function _loadWrapper(path)
 end
 
 
-local self = errTest.new("Parser early work")
+local self = errTest.new("Parser early work", cli_verbosity)
 
 
 local function _commentLoop(parent)

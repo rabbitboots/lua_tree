@@ -32,11 +32,11 @@ local PATH = ... and (...):match("(.-)[^%.]+$") or ""
 local lOut = {}
 
 
-local inspect = require(PATH .. "test.inspect")
+local _argType = require(PATH .. "pile_arg_check").type
+
+
+local inspect = require(PATH .. "test.inspect") -- debug
 local shared = require(PATH .. "lua_shared")
-
-
-local _argType = shared._argType
 
 
 local function _stringQuote(tmp, quote, open)

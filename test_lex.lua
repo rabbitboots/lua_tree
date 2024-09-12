@@ -52,7 +52,7 @@ for i = 0, #arg do
 end
 
 
-local self = errTest.new("Lexer tests.")
+local self = errTest.new("Lexer tests", cli_verbosity)
 
 
 -- [===[

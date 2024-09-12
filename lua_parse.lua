@@ -26,23 +26,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --]]
 
-
---local PATH = ... and (...):match("(.-)[^%.]+$") or ""
-
-
 local parse = {}
 
 
---local stringWalk = require("lib.string_walk.string_walk")
+local PATH = ... and (...):match("(.-)[^%.]+$") or ""
+
+
+--local interp = require(PATH .. "pile_interp")
+local _argType = require(PATH .. "pile_arg_check").type
+local _makeLUT = require(PATH .. "pile_lut").make
+
+
+local lex = require(PATH .. "lua_lex")
+local shared = require(PATH .. "lua_shared")
 
 
 --local inspect = require("test.inspect") -- debug
-local lex = require("lua_lex")
 --local pretty = require("test_pretty") -- debug
-local shared = require("lua_shared")
-
-
-local _argType = shared._argType
 
 
 local void_token = {id="_VOID_", text=""}
@@ -213,9 +213,16 @@ function sym.other(P, id, id2)
 end
 
 
+local function _getLastLine(P)
+	local last_tok = P:peek()
+	return last_tok and last_tok.l or false
+end
+
 -- (Name | '(' exp ')') ('.' Name | '[' exp ']' | ':' Name args | args)*
 -- For [7], [11], [12]
 local function _prefixedExpression(P, id)
+	local last_line = _getLastLine(P)
+
 	local node, node2 = _startCompoundNode(sym.name(P) or sym.other(P, "("), id)
 	if node then
 		P:push(node2)
@@ -223,6 +230,7 @@ local function _prefixedExpression(P, id)
 		if node.id == "(" then
 			P:tryPutReq(sym.exp(P), "expected expression after '('")
 			P:tryPutReq(sym.other(P, ")"), "expected ')' after expression")
+			last_line = _getLastLine(P)
 		end
 
 		while true do
@@ -235,11 +243,14 @@ local function _prefixedExpression(P, id)
 
 			elseif P:tryPut(sym.other(P, ":")) then
 				P:tryPutReq(sym.name(P), "expected name after ':'")
-				P:tryPutReq(sym.args(P), "expected function arguments after name")
+				P:tryPutReq(sym.args(P, last_line), "expected function arguments after name")
 
-			elseif not P:tryPut(sym.args(P)) then
+			elseif P:tryPut(sym.args(P, last_line)) then
+
+			else
 				break
 			end
+			last_line = _getLastLine(P)
 		end
 
 		return P:pop()
@@ -706,9 +717,15 @@ end
 
 
 -- [13] args ::=  '(' [explist] ')' | tableconstructor | String
-function sym.args(P)
+function sym.args(P, last_line)
 	local node, node2 = _startCompoundNode(sym.other(P, "(") or sym.tableconstructor(P) or sym.string(P), "args")
 	if node then
+		if node.id == "(" then
+			if last_line and node.l ~= last_line then
+				P:error("ambiguous syntax")
+			end
+		end
+
 		P:push(node2)
 
 		if node.id == "(" then

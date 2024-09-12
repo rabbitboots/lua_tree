@@ -62,7 +62,7 @@ local function _loadWrapper(path)
 end
 
 
-local self = errTest.new("Output tests.")
+local self = errTest.new("Output tests", cli_verbosity)
 
 
 local function _doIt(self, desc, lua_ver, jit, s)

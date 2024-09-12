@@ -36,45 +36,16 @@ shared.lang = {
 local lang = shared.lang
 
 
-local interp -- v02
-do
-	local v, c = {}, function(t) for k in pairs(t) do t[k] = nil end end
-	interp = function(s, ...)
-		c(v)
-		for i = 1, select("#", ...) do
-			v[tostring(i)] = tostring(select(i, ...))
-		end
-		local r = tostring(s):gsub("%$(%d+)", v):gsub("%$;", "$")
-		c(v)
-		return r
-	end
-end
-shared._interp = interp
+local PATH = ... and (...):match("(.-)[^%.]+$") or ""
 
 
-function shared._argType(n, v, ...) -- list of expected type tags
-	local typ = type(v)
-	for i = 1, select("#", ...) do
-		if typ == select(i, ...) then
-			return
-		end
-	end
-	error(interp(lang.err_arg_bad_type, n, table.concat({...}, ", "), typ), 2)
-end
-local _argType = shared._argType
-
-
-function shared.makeLUT(t)
-	local lut = {}
-	for _, v in ipairs(t) do
-		lut[v] = true
-	end
-	return lut
-end
+local interp = require(PATH .. "pile_interp")
+local _argType = require(PATH .. "pile_arg_check").type
+local _makeLUT = require(PATH .. "pile_lut").make
 
 
 -- NOTE: The lexer and parser having JIT assigned implies version 5.1.
-shared.versions = shared.makeLUT({"5.1", "5.2", "5.3", "5.4"})
+shared.versions = _makeLUT({"5.1", "5.2", "5.3", "5.4"})
 
 
 -- These keywords cannot be used as variable names.
@@ -88,13 +59,13 @@ keywords["5.1"] = {
 	"and", "break", "do", "elseif", "else", "end", "false", "for", "function", "if", "in",
 	"local", "nil", "not", "or", "repeat", "return", "then", "true", "until", "while",
 }
-keywords_hash["5.1"] = shared.makeLUT(keywords["5.1"])
+keywords_hash["5.1"] = _makeLUT(keywords["5.1"])
 
 keywords["5.2"] = {
 	"and", "break", "do", "elseif", "else", "end", "false", "for", "function", "goto", "if", "in",
 	"local", "nil", "not", "or", "repeat", "return", "then", "true", "until", "while",
 }
-keywords_hash["5.2"] = shared.makeLUT(keywords["5.2"])
+keywords_hash["5.2"] = _makeLUT(keywords["5.2"])
 
 keywords["5.3"] = keywords["5.2"]
 keywords_hash["5.3"] = keywords_hash["5.2"]

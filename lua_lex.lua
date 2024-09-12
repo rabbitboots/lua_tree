@@ -26,20 +26,21 @@ SOFTWARE.
 --]]
 
 
---local PATH = ... and (...):match("(.-)[^%.]+$") or ""
-
-
 local lex = {}
 
 
-local stringWalk = require("lib.string_walk")
+local PATH = ... and (...):match("(.-)[^%.]+$") or ""
+
+
+--local interp = require(PATH .. "pile_interp")
+local _argType = require(PATH .. "pile_arg_check").type
+
+
+local shared = require("lua_shared")
+local stringWalk = require(PATH .. "lib.string_walk")
 
 
 --local inspect = require("test.inspect.inspect") -- debug
-local shared = require("lua_shared")
-
-
-local _argType = shared._argType
 
 
 local symbols = {}
