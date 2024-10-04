@@ -61,6 +61,8 @@ In Lua, string character classes are determined by the current locale. This affe
 
 LuaJIT accepts non-ASCII characters for names. In practice, this means you can use multi-byte UTF-8 characters as part of variable identifiers: `¡ö¿`, etc.
 
+**TODO:** Follow up on this bit from the [Lua 5.2 Reference Manual](https://www.lua.org/manual/5.2/manual.html#8): *"Lua identifiers cannot use locale-dependent letters."*
+
 
 ## Differences from the eBNF
 

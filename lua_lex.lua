@@ -37,7 +37,7 @@ local _argType = require(PATH .. "pile_arg_check").type
 
 
 local shared = require("lua_shared")
-local stringWalk = require(PATH .. "lib.string_walk")
+local stringWalk = require(PATH .. "string_walk")
 
 
 --local inspect = require("test.inspect.inspect") -- debug

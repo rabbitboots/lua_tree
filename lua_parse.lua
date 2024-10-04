@@ -32,9 +32,8 @@ local parse = {}
 local PATH = ... and (...):match("(.-)[^%.]+$") or ""
 
 
---local interp = require(PATH .. "pile_interp")
+--local interp = require(PATH .. "pile_interp") -- TODO
 local _argType = require(PATH .. "pile_arg_check").type
-local _makeLUT = require(PATH .. "pile_lut").make
 
 
 local lex = require(PATH .. "lua_lex")
@@ -42,7 +41,7 @@ local shared = require(PATH .. "lua_shared")
 
 
 --local inspect = require("test.inspect") -- debug
---local pretty = require("test_pretty") -- debug
+--local pretty = require("test_lua_pretty") -- debug
 
 
 local void_token = {id="_VOID_", text=""}

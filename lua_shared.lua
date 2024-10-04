@@ -41,7 +41,7 @@ local PATH = ... and (...):match("(.-)[^%.]+$") or ""
 
 local interp = require(PATH .. "pile_interp")
 local _argType = require(PATH .. "pile_arg_check").type
-local _makeLUT = require(PATH .. "pile_lut").make
+local _makeLUT = require(PATH .. "pile_table").makeLUT
 
 
 -- NOTE: The lexer and parser having JIT assigned implies version 5.1.

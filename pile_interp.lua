@@ -1,6 +1,6 @@
--- PILE interp v1.0.0 (modified)
+-- PILE interp v1.1.0
 -- (C) 2024 PILE Contributors
--- License: MIT
+-- License: MIT or MIT-0
 -- https://github.com/rabbitboots/pile_base
 
 
